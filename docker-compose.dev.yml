@@ -1,0 +1,68 @@
+services:
+  checker:
+    build:
+      context: checker
+    container_name: gopingpatrol-checker
+    volumes:
+      - ./config/config.toml:/app/config.toml
+    depends_on:
+      - healthy1
+      - healthy2
+      - healthy3
+      - healthy4
+      - healthy5
+      - unhealthy1
+      - unhealthy2
+      - unhealthy3
+      - unhealthy4
+      - unhealthy5
+  healthy1:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 200
+  healthy2:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 200
+  healthy3:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 200
+  healthy4:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 200
+  healthy5:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 200
+  unhealthy1:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 500
+  unhealthy2:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 500
+  unhealthy3:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 500
+  unhealthy4:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 500
+  unhealthy5:
+    build:
+      context: test_server
+    environment:
+      HEALTH_CODE: 500

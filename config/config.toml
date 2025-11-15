@@ -1,0 +1,13 @@
+scrape_interval = "15s"
+URLs = [
+  "http://healthy1:80/health",
+  "http://healthy2:80/health",
+  "http://healthy3:80/health",
+  "http://healthy4:80/health",
+  "http://healthy5:80/health",
+  "http://unhealthy1:80/health",
+  "http://unhealthy2:80/health",
+  "http://unhealthy3:80/health",
+  "http://unhealthy4:80/health",
+  "http://unhealthy5:80/health",
+]
