@@ -7,16 +7,6 @@ services:
       - ./config/config.toml:/app/config.toml
     depends_on:
       - rabbitmq
-      - healthy1
-      - healthy2
-      - healthy3
-      - healthy4
-      - healthy5
-      - unhealthy1
-      - unhealthy2
-      - unhealthy3
-      - unhealthy4
-      - unhealthy5
   bot:
     build:
       context: bot
@@ -44,56 +34,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
-  healthy1:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 200
-  healthy2:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 200
-  healthy3:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 200
-  healthy4:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 200
-  healthy5:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 200
-  unhealthy1:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 500
-  unhealthy2:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 500
-  unhealthy3:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 500
-  unhealthy4:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 500
-  unhealthy5:
-    build:
-      context: test_server
-    environment:
-      HEALTH_CODE: 500
 
 volumes:
   gopingpatroldata:
