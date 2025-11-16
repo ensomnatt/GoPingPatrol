@@ -26,6 +26,17 @@ services:
     depends_on:
       - checker
       - rabbitmq
+      - bot-db
+  bot-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+    volumes:
+      - gopingpatroldata:/var/lib/postgresql
   rabbitmq:
     image: rabbitmq:4.2-management
     ports:
@@ -83,3 +94,6 @@ services:
       context: test_server
     environment:
       HEALTH_CODE: 500
+
+volumes:
+  gopingpatroldata:
