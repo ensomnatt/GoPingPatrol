@@ -3,6 +3,7 @@ package scraper
 import (
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/ensomnatt/gopingpatrol/checker/internal/config"
 	"github.com/ensomnatt/gopingpatrol/checker/internal/logger"
@@ -21,23 +22,36 @@ func New(log *logger.Logger, cfg config.Config) *Scraper {
 }
 
 func (s *Scraper) Start() {
-	var wg sync.WaitGroup
-	maxWorkers := 10
-	sem := make(chan struct{}, maxWorkers)
-
-	s.log.Info("Start scraping")
-	for _, url := range s.cfg.URLs {
-		wg.Add(1)
-		sem <- struct{}{}
-		go func(url string) {
-			defer wg.Done()
-			s.checkHealth(url)
-			<-sem
-		}(url)
+	interval, err := time.ParseDuration(s.cfg.ScrapeInterval)
+	if err != nil {
+		s.log.Errorf("Error while parsing duration: %v", err)
+		return
 	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
 
-	wg.Wait()
-	s.log.Info("Stop scraping")
+	for {
+		s.log.Info("Start scraping")
+
+		var wg sync.WaitGroup
+		maxWorkers := 10
+		sem := make(chan struct{}, maxWorkers)
+
+		for _, url := range s.cfg.URLs {
+			wg.Add(1)
+			sem <- struct{}{}
+			go func(url string) {
+				defer wg.Done()
+				s.checkHealth(url)
+				<-sem
+			}(url)
+		}
+
+		wg.Wait()
+		s.log.Info("Stop scraping")
+
+		<-ticker.C
+	}
 }
 
 func (s *Scraper) checkHealth(url string) {
