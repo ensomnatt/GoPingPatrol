@@ -20,6 +20,6 @@ This will run 4 containers: checker, bot, bot's db and rabbitmq.
 - typescript (puregram) for bot
 - several python lines (flask) for test server (only for dev)
 
-**db**: postgresql
-**message broker:** rabbitmq
+**db**: postgresql  
+**message broker:** rabbitmq  
 **deploy:** docker (compose)
