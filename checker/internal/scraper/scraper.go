@@ -7,25 +7,27 @@ import (
 
 	"github.com/ensomnatt/gopingpatrol/checker/internal/config"
 	"github.com/ensomnatt/gopingpatrol/checker/internal/logger"
+	"github.com/ensomnatt/gopingpatrol/checker/internal/producer"
 )
 
 type Scraper struct {
-	log *logger.Logger
-	cfg config.Config
+	log  *logger.Logger
+	cfg  *config.Config
+	prod *producer.Producer
 }
 
-func New(log *logger.Logger, cfg config.Config) *Scraper {
+func New(log *logger.Logger, cfg *config.Config, prod *producer.Producer) *Scraper {
 	return &Scraper{
-		log: log,
-		cfg: cfg,
+		log:  log,
+		cfg:  cfg,
+		prod: prod,
 	}
 }
 
-func (s *Scraper) Start() {
+func (s *Scraper) Start() error {
 	interval, err := time.ParseDuration(s.cfg.ScrapeInterval)
 	if err != nil {
-		s.log.Errorf("Error while parsing duration: %v", err)
-		return
+		return err
 	}
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
@@ -63,6 +65,7 @@ func (s *Scraper) checkHealth(url string) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		s.prod.Publish(url)
 		s.log.Infof("New alert: %s, status code - %v", url, resp.StatusCode)
 	} else {
 		s.log.Infof("Checked %s", url)

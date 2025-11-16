@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 
-	"github.com/ensomnatt/gopingpatrol/checker/internal/logger"
 	"github.com/pelletier/go-toml/v2"
 )
 
@@ -12,17 +11,17 @@ type Config struct {
 	URLs           []string `toml:"urls"`
 }
 
-func Load(log *logger.Logger) Config {
+func Load() (*Config, error) {
 	doc, err := os.ReadFile("/app/config.toml")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var config Config
 	err = toml.Unmarshal(doc, &config)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return config
+	return &config, nil
 }
