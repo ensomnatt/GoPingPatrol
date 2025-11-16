@@ -1,0 +1,13 @@
+# RENAME THIS FILE TO "config.toml"
+
+# time between checkings
+scrape_interval = "15s"
+
+# telegram bot token
+token = "ablablalbalb"
+
+# URLs
+URLs = [
+  "https://youtube.com/health",
+  "https://twitch.tv/health"
+]
