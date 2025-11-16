@@ -11,8 +11,10 @@ type Config struct {
 	URLs           []string `toml:"urls"`
 }
 
+var ConfigPath = "/app/config.toml"
+
 func Load() (*Config, error) {
-	doc, err := os.ReadFile("/app/config.toml")
+	doc, err := os.ReadFile(ConfigPath)
 	if err != nil {
 		return nil, err
 	}
