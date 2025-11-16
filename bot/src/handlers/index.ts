@@ -7,4 +7,6 @@ export function registerHandlers(hm: HearManager<MessageContext>, telegram: Tele
   hm.hear("/start", (ctx) => messagesHandler.start(ctx));
 
   telegram.updates.on("callback_query", (ctx) => callbacksHandler.subsribe(ctx));
+
+  messagesHandler.alert(telegram);
 }
