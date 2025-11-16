@@ -1,6 +1,8 @@
 package producer
 
 import (
+	"time"
+
 	"github.com/ensomnatt/gopingpatrol/checker/internal/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -13,30 +15,35 @@ type Producer struct {
 }
 
 func New(log *logger.Logger) (*Producer, error) {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672")
-	if err != nil {
-		return nil, err
+	retries := 5
+	delay := 2 * time.Second
+
+	var err error
+	for i := 0; i < retries; i++ {
+		conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672")
+		if err == nil {
+			ch, err := conn.Channel()
+			if err == nil {
+				q, err := ch.QueueDeclare("alerts", false, false, false, false, nil)
+				if err == nil {
+					// Успешное подключение
+					return &Producer{
+						log:  log,
+						conn: conn,
+						ch:   ch,
+						q:    q.Name,
+					}, nil
+				}
+				ch.Close()
+			}
+			conn.Close()
+		}
+
+		log.Infof("Unable to connect to rabbitmq: %v. Next try %d/%d after %s...", err, i+1, retries, delay)
+		time.Sleep(delay)
 	}
 
-	ch, err := conn.Channel()
-	if err != nil {
-		conn.Close()
-		return nil, err
-	}
-
-	q, err := ch.QueueDeclare("alerts", false, false, false, false, nil)
-	if err != nil {
-		conn.Close()
-		ch.Close()
-		return nil, err
-	}
-
-	return &Producer{
-		log:  log,
-		conn: conn,
-		ch:   ch,
-		q:    q.Name,
-	}, nil
+	return nil, err
 }
 
 func (p *Producer) Close() {

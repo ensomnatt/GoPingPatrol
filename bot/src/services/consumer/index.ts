@@ -7,16 +7,24 @@ export class Consumer {
 
   constructor(private url: string, private queue: string) { }
 
-  async connect() {
-    try {
-      this.connection = await amqp.connect(this.url);
-      this.channel = await this.connection.createChannel();
-
-      await this.channel.assertQueue(this.queue, { durable: false });
-      logger.info(`Connected to rabbitmq queue: ${this.queue}`);
-    } catch (err) {
-      logger.error(err, "Failed to connect to rabbitmq");
-      throw err;
+  async connect(retries = 5, delay = 2000): Promise<void> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        this.connection = await amqp.connect(this.url);
+        this.channel = await this.connection.createChannel();
+        await this.channel.assertQueue(this.queue, { durable: false });
+        logger.info(`Connected to rabbitmq queue: ${this.queue}`);
+        return;
+      } catch (err) {
+        logger.error(`Failed to connect to rabbitmq (attempt ${attempt}/${retries}): ${err}`);
+        if (attempt < retries) {
+          const waitTime = delay * attempt;
+          logger.info(`Retrying in ${waitTime}ms...`);
+          await new Promise(res => setTimeout(res, waitTime));
+        } else {
+          throw err;
+        }
+      }
     }
   }
 
